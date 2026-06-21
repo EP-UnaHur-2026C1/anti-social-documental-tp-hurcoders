@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // Valida que el parametro :id sea un ObjectId valido de Mongo.
 const validateObjectId = (req, res, next) => {
@@ -8,4 +8,4 @@ const validateObjectId = (req, res, next) => {
   next();
 };
 
-module.exports = validateObjectId;
+export default validateObjectId;

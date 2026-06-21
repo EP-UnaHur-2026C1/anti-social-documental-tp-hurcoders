@@ -1,12 +1,12 @@
-const { Router } = require('express');
-const {
+import { Router } from 'express';
+import {
   getUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
-} = require('../controllers/users.controller');
-const validateObjectId = require('../middlewares/validateObjectId');
+} from '../controllers/users.controller.js';
+import validateObjectId from '../middlewares/validateObjectId.js';
 
 const router = Router();
 
@@ -16,4 +16,4 @@ router.post('/', createUser);
 router.put('/:id', validateObjectId, updateUser);
 router.delete('/:id', validateObjectId, deleteUser);
 
-module.exports = router;
+export default router;

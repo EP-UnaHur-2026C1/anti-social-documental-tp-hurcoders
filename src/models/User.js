@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-// Usuario registrado. nickName es unico y funciona como identificador de negocio.
 const userSchema = new mongoose.Schema(
   {
     nickName: {
@@ -17,4 +16,4 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+export default User;

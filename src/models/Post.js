@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-// Publicacion de un usuario. user es una REFERENCIA al autor.
 const postSchema = new mongoose.Schema(
   {
     title: {
@@ -29,4 +28,4 @@ const postSchema = new mongoose.Schema(
 
 const Post = mongoose.model('Post', postSchema);
 
-module.exports = Post;
+export default Post;

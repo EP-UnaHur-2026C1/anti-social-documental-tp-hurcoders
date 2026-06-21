@@ -1,23 +1,16 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 let memoryServer = null;
 
-// Conecta a MongoDB.
-// - Si MONGO_URL esta definido, usa esa instancia (local, Docker o Atlas) y los
-//   datos persisten entre reinicios.
-// - Si no, levanta una base en memoria (mongodb-memory-server) en el directorio
-//   temporal del sistema, util para desarrollar sin instalar MongoDB ni Docker.
-//   Nota: la base en memoria se reinicia con cada arranque.
 const connectToDatabase = async () => {
   try {
     let url = process.env.MONGO_URL;
 
     if (!url) {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
 
       memoryServer = await MongoMemoryServer.create({
         binary: {
-          // mongod 7.0.x: version estable que mongodb-memory-server parsea sin errores.
           version: '7.0.14',
         },
         instance: {
@@ -38,7 +31,6 @@ const connectToDatabase = async () => {
   }
 };
 
-// Cierra la conexion y, si corresponde, detiene la base en memoria.
 connectToDatabase.disconnect = async () => {
   await mongoose.disconnect();
   if (memoryServer) {
@@ -46,4 +38,4 @@ connectToDatabase.disconnect = async () => {
   }
 };
 
-module.exports = connectToDatabase;
+export default connectToDatabase;

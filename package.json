@@ -2,6 +2,7 @@
   "name": "anti-social-entrega",
   "version": "1.0.0",
   "description": "UnaHur anti-social net - Trabajo Practico (MongoDB + Mongoose)",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
