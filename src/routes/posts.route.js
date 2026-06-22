@@ -1,19 +1,39 @@
-import { Router } from 'express';
-import {
-  getPosts,
-  getPostById,
-  createPost,
-  updatePost,
-  removePost,
-} from '../controllers/posts.controller.js';
-import validateObjectId from '../middlewares/validateObjectId.js';
+'use strict';
+const router = require('express').Router();
+const postCtrl = require('../controllers/posts.controller');
+const commentCtrl = require('../controllers/comments.controller');
+const schemaValidator = require('../middlewares/schemaValidator');
+const { postSchema, commentSchema, postImageSchema } = require('../schemas/schemas');
+const { Post } = require('../models');
+const validaExisteMiddleware = require('../middlewares/existeMiddleware');
+const validateObjectId = require('../middlewares/validateObjectId');
 
-const router = Router();
+const existePost = [validateObjectId(), validaExisteMiddleware(Post)];
+const existePostComoPostId = [
+  validateObjectId('postId'),
+  validaExisteMiddleware(Post, 'postId'),
+];
 
-router.get('/', getPosts);
-router.get('/:id', validateObjectId, getPostById);
-router.post('/', createPost);
-router.put('/:id', validateObjectId, updatePost);
-router.delete('/:id', validateObjectId, removePost);
+//CRUD Posts
+router.get('/', postCtrl.getPosts);
+router.get('/:id', ...existePost, postCtrl.getPostById);
+router.post('/', schemaValidator(postSchema.create), postCtrl.createPost);
+router.put('/:id', ...existePost, schemaValidator(postSchema.update), postCtrl.updatePost);
+router.delete('/:id', ...existePost, postCtrl.removePost);
+
+// Tags
+router.post('/:id/tags/:tagId', ...existePost, postCtrl.addTag);
+router.delete('/:id/tags/:tagId', ...existePost, postCtrl.removeTag);
+
+// Comments
+router.get('/:postId/comments', ...existePostComoPostId, commentCtrl.getCommentsByPost);
+router.post(
+  '/:postId/comments',
+  ...existePostComoPostId,
+  schemaValidator(commentSchema.create),
+  commentCtrl.createComment
+);
+router.put('/:postId/comments/:id', ...existePostComoPostId, schemaValidator(commentSchema.update), commentCtrl.updateComment);
+router.delete('/:postId/comments/:id', ...existePostComoPostId, commentCtrl.deleteComment);
 
 export default router;
