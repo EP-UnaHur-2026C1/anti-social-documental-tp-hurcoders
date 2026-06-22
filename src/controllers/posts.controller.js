@@ -1,5 +1,4 @@
-import Post from '../models/Post.js';
-import User from '../models/User.js';
+const { Post, User, PostImage, Comment, Tag, PostTag } = require('../models');
 
 const getPosts = async (req, res) => {
   try {
