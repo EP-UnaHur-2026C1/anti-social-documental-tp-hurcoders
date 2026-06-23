@@ -1,15 +1,23 @@
-const router = require('express').Router();
-const ctrl = require('../controllers/users.controller');
-const schemaValidator = require('../middlewares/schemaValidator.js');
-const validaExisteMiddleware = require('../middlewares/existeMiddleware');
-const validateObjectId = require('../middlewares/validateObjectId');
-const { userSchema } = require('../schemas/schemas');
-const { User } = require('../models');
+import { Router } from 'express';
+import {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '../controllers/users.controller.js';
+import schemaValidator from '../middlewares/schemaValidator.js';
+import validaExisteMiddleware from '../middlewares/existeMiddleware.js';
+import validateObjectId from '../middlewares/validateObjectId.js';
+import { userSchema } from '../schemas/schemas.js';
+import { User } from '../models/index.js';
 
-router.get('/', ctrl.getUsers);
-router.get('/:id', validateObjectId(), validaExisteMiddleware(User), ctrl.getUserById);
-router.post('/', schemaValidator(userSchema.create), ctrl.createUser);
-router.put('/:id', validateObjectId, validaExisteMiddleware(User), validate(userSchema.update), ctrl.updateUser, ctrl.updateUser);
-router.delete('/:id', validateObjectId, validaExisteMiddleware(User), ctrl.deleteUser);
+const router = Router();
 
-module.exports = router;
+router.get('/', getUsers);
+router.get('/:id', validateObjectId(), validaExisteMiddleware(User), getUserById);
+router.post('/', schemaValidator(userSchema.create), createUser);
+router.put('/:id', validateObjectId(), validaExisteMiddleware(User), schemaValidator(userSchema.update), updateUser);
+router.delete('/:id', validateObjectId(), validaExisteMiddleware(User), deleteUser);
+
+export default router;

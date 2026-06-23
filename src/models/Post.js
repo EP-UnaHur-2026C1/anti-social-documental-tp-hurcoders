@@ -1,6 +1,20 @@
 
 import mongoose from 'mongoose';
 
+const imageSchema = new mongoose.Schema(
+  {
+    imageUrl: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  {
+    _id: true,
+    timestamps: { createdAt: true, updatedAt: false },
+  }
+);
+
 const postSchema = new mongoose.Schema(
   {
     title: {
@@ -16,11 +30,12 @@ const postSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
+    images: [imageSchema],
   },
   {
     timestamps: true,

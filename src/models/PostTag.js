@@ -10,12 +10,12 @@ import mongoose from 'mongoose';
 const postTagSchema = new mongoose.Schema(
   {
     postId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Post',
       required: true,
     },
     tagId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Tag',
       required: true,
     },
@@ -31,4 +31,4 @@ postTagSchema.index({ postId: 1, tagId: 1 }, { unique: true });
 
 const PostTag = mongoose.model('PostTag', postTagSchema);
 
-export default Post;
+export default PostTag;

@@ -21,7 +21,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [title, content, user]
+              required: [title, content, userId]
               properties:
                 title:
                   type: string
@@ -31,7 +31,7 @@ paths:
                   type: string
                   description: Contenido del post
                   example: "Hola mundo!"
-                user:
+                userId:
                   type: string
                   description: ID del usuario autor
       responses:
@@ -114,6 +114,60 @@ paths:
         '404':
           description: Post no encontrado
 
+  /posts/{id}/images:
+    post:
+      summary: Agregar imagen embebida por URL
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [imageUrl]
+              properties:
+                imageUrl:
+                  type: string
+                  format: uri
+                  example: "https://example.com/imagen.jpg"
+      responses:
+        '201':
+          description: Imagen embebida agregada al post
+        '400':
+          description: Error de validación
+        '404':
+          description: Post no encontrado
+
+  /posts/{id}/images/{imageId}:
+    delete:
+      summary: Eliminar imagen embebida
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del post
+        - in: path
+          name: imageId
+          required: true
+          schema:
+            type: string
+          description: ID de la imagen embebida
+      responses:
+        '204':
+          description: Imagen eliminada
+        '404':
+          description: Post o imagen no encontrada
+
 components:
   schemas:
     Post:
@@ -132,7 +186,7 @@ components:
           type: string
           format: date-time
           description: Fecha de publicación
-        user:
+        userId:
           type: object
           properties:
             _id:
@@ -140,6 +194,19 @@ components:
             nickName:
               type: string
           description: Usuario autor (populado)
+        images:
+          type: array
+          description: Imagenes embebidas en el post
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              imageUrl:
+                type: string
+              createdAt:
+                type: string
+                format: date-time
         createdAt:
           type: string
           format: date-time

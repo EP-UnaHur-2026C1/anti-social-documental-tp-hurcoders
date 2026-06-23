@@ -1,5 +1,6 @@
-const { Comment, User } = require('../models');
-const responderErrorMongo = require('../utils/responderErrorMongo');
+import { Comment, User } from '../models/index.js';
+import responderErrorMongo from '../utils/responderErrorMongo.js';
+import invalidatePostCache from '../utils/postCache.js';
 
 const visibilityMonths = parseInt(process.env.COMMENT_VISIBILITY_MONTHS || '6', 10);
 
@@ -40,6 +41,7 @@ const createComment = async (req, res) => {
       postId: req.params.postId,
       isVisible: true,
     });
+    await invalidatePostCache(req.params.postId);
     res.status(201).json(comment);
   } catch (err) {
     return responderErrorMongo(res, err);
@@ -53,6 +55,7 @@ const updateComment = async (req, res) => {
     { new: true, runValidators: true }
   );
   if (!comment) return res.status(404).json({ error: 'Comment not found' });
+  await invalidatePostCache(req.params.postId);
   res.json(comment);
 };
 
@@ -62,7 +65,8 @@ const deleteComment = async (req, res) => {
     postId: req.params.postId,
   });
   if (!comment) return res.status(404).json({ error: 'Comment not found' });
+  await invalidatePostCache(req.params.postId);
   res.status(204).send();
 };
 
-module.exports = { getCommentsByPost, createComment, updateComment, deleteComment };
+export { getCommentsByPost, createComment, updateComment, deleteComment };

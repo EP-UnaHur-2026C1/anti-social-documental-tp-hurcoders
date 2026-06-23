@@ -2,12 +2,13 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
 import swaggerJsdoc from 'swagger-jsdoc';
 import connectToDatabase from './src/config/db.js';
+import { connectRedis } from './src/config/redis.js';
 
 import userRoutes from './src/routes/users.route.js';
 import postRoutes from './src/routes/posts.route.js';
+import tagRoutes from './src/routes/tags.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,8 +46,15 @@ app.get('/', (req, res) => {
 
 app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
+app.use('/tags', tagRoutes);
 
-connectToDatabase().then(() => {
+connectToDatabase().then(async () => {
+  try {
+    await connectRedis();
+  } catch (err) {
+    console.log('Redis no disponible, la API sigue sin cache:', err.message);
+  }
+
   app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
   });

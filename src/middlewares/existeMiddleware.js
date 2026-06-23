@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 /**
  * Valida que exista un documento con el _id recibido en el parámetro de
  * ruta indicado, para el Modelo Mongoose pasado por parámetro. Si existe,
@@ -24,6 +22,4 @@ const validaExisteMiddleware = (Modelo, nombreParametro = 'id') => {
   };
 };
 
-module.exports = {
-  validaExisteMiddleware,
-};
+export default validaExisteMiddleware;

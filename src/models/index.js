@@ -1,10 +1,7 @@
-'use strict';
+import User from './User.js';
+import Post from './Post.js';
+import Comment from './Comment.js';
+import Tag from './Tag.js';
+import PostTag from './PostTag.js';
 
-module.exports = {
-  User: require('./User'),
-  Post: require('./Post'),
-  PostImage: require('./PostImage'),
-  Comment: require('./Comment'),
-  Tag: require('./Tag'),
-  PostTag: require('./PostTag'),
-};
+export { User, Post, Comment, Tag, PostTag };

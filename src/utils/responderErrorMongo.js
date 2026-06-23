@@ -33,4 +33,4 @@ function responderErrorMongo(res, error) {
   return res.status(500).json({ message: 'Error interno del servidor.' });
 }
 
-module.exports = responderErrorMongo;
+export default responderErrorMongo;

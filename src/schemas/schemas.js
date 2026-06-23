@@ -1,4 +1,4 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
 const objectId = Joi.string().hex().length(24);
 
@@ -47,4 +47,4 @@ const postImageSchema = {
   }),
 };
 
-module.exports = { objectId, userSchema, postSchema, commentSchema, tagSchema, postImageSchema };
+export { objectId, userSchema, postSchema, commentSchema, tagSchema, postImageSchema };

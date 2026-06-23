@@ -1,22 +1,29 @@
-'use strict';
-const router = require('express').Router();
-const ctrl = require('../controllers/tags.controller');
-const schemaValidator = require('../middlewares/schemaValidator');
-const { tagSchema } = require('../schemas/schemas');
-const { Tag } = require('../models');
-const validaExisteMiddleware = require('../middlewares/existeMiddleware');
-const validateObjectId = require('../middlewares/validateObjectId');
+import { Router } from 'express';
+import {
+  getTags,
+  getTagById,
+  createTag,
+  updateTag,
+  removeTag,
+} from '../controllers/tags.controller.js';
+import schemaValidator from '../middlewares/schemaValidator.js';
+import { tagSchema } from '../schemas/schemas.js';
+import { Tag } from '../models/index.js';
+import validaExisteMiddleware from '../middlewares/existeMiddleware.js';
+import validateObjectId from '../middlewares/validateObjectId.js';
 
-router.get('/', ctrl.getTags);
-router.get('/:id', validateObjectId(), validaExisteMiddleware(Tag), ctrl.getTagById);
-router.post('/', schemaValidator(tagSchema.create), ctrl.createTag);
+const router = Router();
+
+router.get('/', getTags);
+router.get('/:id', validateObjectId(), validaExisteMiddleware(Tag), getTagById);
+router.post('/', schemaValidator(tagSchema.create), createTag);
 router.put(
   '/:id',
   validateObjectId(),
   validaExisteMiddleware(Tag),
   schemaValidator(tagSchema.update),
-  ctrl.updateTag
+  updateTag
 );
-router.delete('/:id', validateObjectId(), validaExisteMiddleware(Tag), ctrl.removeTag);
+router.delete('/:id', validateObjectId(), validaExisteMiddleware(Tag), removeTag);
 
-module.exports = router;
+export default router;

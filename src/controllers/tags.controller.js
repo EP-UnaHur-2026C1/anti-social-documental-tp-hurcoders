@@ -1,5 +1,6 @@
-const { Tag, PostTag, Post } = require('../models');
-const responderErrorMongo = require('../utils/responderErrorMongo');
+import { Tag, PostTag, Post } from '../models/index.js';
+import responderErrorMongo from '../utils/responderErrorMongo.js';
+import invalidatePostCache from '../utils/postCache.js';
 
 const getTags = async (req, res) => {
   const tags = await Tag.find().sort({ name: 1 });
@@ -32,6 +33,7 @@ const updateTag = async (req, res) => {
       new: true,
       runValidators: true,
     });
+    await invalidatePostCache();
     res.json(tag);
   } catch (err) {
     return responderErrorMongo(res, err);
@@ -41,7 +43,8 @@ const updateTag = async (req, res) => {
 const removeTag = async (req, res) => {
   await Tag.findByIdAndDelete(req.params.id);
   await PostTag.deleteMany({ tagId: req.params.id });
+  await invalidatePostCache();
   res.status(204).send();
 };
 
-module.exports = { getTags, getTagById, createTag, updateTag, removeTag };
+export { getTags, getTagById, createTag, updateTag, removeTag };
