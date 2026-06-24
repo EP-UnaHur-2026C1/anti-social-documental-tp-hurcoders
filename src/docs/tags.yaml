@@ -1,0 +1,211 @@
+paths:
+
+  /tags:
+    get:
+      summary: Obtener todos los tags
+      tags: [Tags]
+      responses:
+        '200':
+          description: Lista de tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+
+    post:
+      summary: Crear un tag
+      tags: [Tags]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  description: Nombre único del tag
+                  example: javascript
+      responses:
+        '201':
+          description: Tag creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '409':
+          description: El nombre del tag ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tags/{id}:
+    get:
+      summary: Obtener un tag por ID (incluye sus posts asociados)
+      tags: [Tags]
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Tag encontrado con sus posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagWithPosts'
+        '400':
+          $ref: '#/components/responses/BadObjectId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Actualizar un tag
+      tags: [Tags]
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: nodejs
+      responses:
+        '200':
+          description: Tag actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          $ref: '#/components/responses/BadObjectId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Eliminar un tag (y sus asociaciones con posts)
+      tags: [Tags]
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Tag eliminado
+        '400':
+          $ref: '#/components/responses/BadObjectId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /posts/{id}/tags/{tagId}:
+    post:
+      summary: Asociar un tag a un post
+      tags: [Tags]
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: tagId
+          in: path
+          required: true
+          description: ObjectId del tag a asociar
+          schema:
+            type: string
+          example: 665f1a2b3c4d5e6f7a8b9c0e
+      responses:
+        '201':
+          description: Tag asociado al post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tag agregado al Post
+        '400':
+          $ref: '#/components/responses/BadObjectId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: El tag ya estaba asociado a este post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Desasociar un tag de un post
+      tags: [Tags]
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: tagId
+          in: path
+          required: true
+          description: ObjectId del tag a desasociar
+          schema:
+            type: string
+          example: 665f1a2b3c4d5e6f7a8b9c0e
+      responses:
+        '204':
+          description: Tag desasociado
+        '400':
+          $ref: '#/components/responses/BadObjectId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    
+components:
+  schemas:
+    Tag:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del tag
+          example: 665f1a2b3c4d5e6f7a8b9c0e
+        name:
+          type: string
+          description: Nombre único del tag
+          example: javascript
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+ 
+    TagWithPosts:
+      allOf:
+        - $ref: '#/components/schemas/Tag'
+        - type: object
+          properties:
+            posts:
+              type: array
+              description: Posts asociados al tag
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  description:
+                    type: string
+                  postDate:
+                    type: string
+                    format: date-time
+                  userId:
+                    type: string
+ 
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Resource not found
+        message:
+          type: string
+          example: El id 665f... en modelo Tag no existe
+ 
