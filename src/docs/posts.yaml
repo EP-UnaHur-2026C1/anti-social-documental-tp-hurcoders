@@ -34,6 +34,7 @@ paths:
                 userId:
                   type: string
                   description: ID del usuario autor
+                  example: "6a3dc5b131fedad47dd579e3"
       responses:
         '201':
           description: Post creado
@@ -85,8 +86,6 @@ paths:
             schema:
               type: object
               properties:
-                title:
-                  type: string
                 content:
                   type: string
       responses:
@@ -168,6 +167,134 @@ paths:
         '404':
           description: Post o imagen no encontrada
 
+  /posts/{postId}/comments:
+    get:
+      summary: Obtener comentarios de un post
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID del post
+      responses:
+        '200':
+          description: Lista de comentarios del post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          description: ID no válido
+        '404':
+          description: Post no encontrado
+
+    post:
+      summary: Crear un comentario en un post
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID del post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content, userId]
+              properties:
+                content:
+                  type: string
+                  description: Contenido del comentario
+                  example: "Muy buen post!"
+                userId:
+                  type: string
+                  description: ID del usuario que comenta
+                  example: "665f1a2b3c4d5e6f7a8b9c0d"
+      responses:
+        '201':
+          description: Comentario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Error de validación
+        '404':
+          description: Post no encontrado
+
+  /posts/{postId}/comments/{id}:
+    put:
+      summary: Actualizar un comentario
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID del post
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del comentario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  description: Nuevo contenido del comentario
+                  example: "Actualicé mi comentario"
+      responses:
+        '200':
+          description: Comentario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: ID no válido
+        '404':
+          description: Post o comentario no encontrado
+
+    delete:
+      summary: Eliminar un comentario
+      tags: [Posts]
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID del post
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del comentario
+      responses:
+        '204':
+          description: Comentario eliminado
+        '400':
+          description: ID no válido
+        '404':
+          description: Post o comentario no encontrado
+
 components:
   schemas:
     Post:
@@ -213,3 +340,32 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del comentario
+        content:
+          type: string
+          description: Contenido del comentario
+        commentDate:
+          type: string
+          format: date-time
+          description: Fecha del comentario
+        isVisible:
+          type: boolean
+          description: Indica si el comentario es visible según la ventana de visibilidad
+          example: true
+        postId:
+          type: string
+          description: ID del post asociado
+        userId:
+          type: object
+          properties:
+            _id:
+              type: string
+            nickName:
+              type: string
+          description: Usuario autor (populado)

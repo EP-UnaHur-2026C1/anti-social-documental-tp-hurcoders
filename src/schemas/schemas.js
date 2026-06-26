@@ -1,6 +1,10 @@
 import Joi from 'joi';
 
-const objectId = Joi.string().hex().length(24);
+const objectId = Joi.string().hex().length(24).messages({
+  'string.hex': 'El campo {{#label}} debe ser un ObjectId válido (hexadecimal)',
+  'string.length': 'El campo {{#label}} debe tener exactamente 24 caracteres',
+  'any.required': 'El campo {{#label}} es obligatorio',
+});
 
 const userSchema = {
   create: Joi.object({

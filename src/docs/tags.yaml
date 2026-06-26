@@ -1,5 +1,4 @@
 paths:
-
   /tags:
     get:
       summary: Obtener todos los tags
@@ -108,13 +107,7 @@ paths:
       tags: [Tags]
       parameters:
         - $ref: '#/components/parameters/id'
-        - name: tagId
-          in: path
-          required: true
-          description: ObjectId del tag a asociar
-          schema:
-            type: string
-          example: 665f1a2b3c4d5e6f7a8b9c0e
+        - $ref: '#/components/parameters/tagId'
       responses:
         '201':
           description: Tag asociado al post
@@ -142,13 +135,7 @@ paths:
       tags: [Tags]
       parameters:
         - $ref: '#/components/parameters/id'
-        - name: tagId
-          in: path
-          required: true
-          description: ObjectId del tag a desasociar
-          schema:
-            type: string
-          example: 665f1a2b3c4d5e6f7a8b9c0e
+        - $ref: '#/components/parameters/tagId'
       responses:
         '204':
           description: Tag desasociado
@@ -157,8 +144,39 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    
 components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: ID del recurso (Post)
+      schema:
+        type: string
+        example: 665f1a2b3c4d5e6f7a8b9c0e
+    tagId:
+      name: tagId
+      in: path
+      required: true
+      description: ObjectId del tag a asociar/desasociar
+      schema:
+        type: string
+        example: 665f1a2b3c4d5e6f7a8b9c0e
+
+  responses:
+    BadObjectId:
+      description: ID provisto no es un ObjectId válido de MongoDB
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: El recurso solicitado no existe
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
   schemas:
     Tag:
       type: object
@@ -177,7 +195,7 @@ components:
         updatedAt:
           type: string
           format: date-time
- 
+
     TagWithPosts:
       allOf:
         - $ref: '#/components/schemas/Tag'
@@ -191,14 +209,16 @@ components:
                 properties:
                   _id:
                     type: string
+                    description: ID del post
                   description:
                     type: string
+                    description: Descripción o contenido del post
                   postDate:
                     type: string
                     format: date-time
                   userId:
                     type: string
- 
+
     Error:
       type: object
       properties:
@@ -208,4 +228,3 @@ components:
         message:
           type: string
           example: El id 665f... en modelo Tag no existe
- 
