@@ -46,9 +46,27 @@ const getPosts = async (req, res) => {
       .populate('userId', 'nickName')
       .sort({ postDate: -1 });
 
-    await setCache(cacheKeys.postsList, posts);
+    const postIds = posts.map((p) => p._id);
 
-    res.json(posts);
+    const [comments, postTags] = await Promise.all([
+      Comment.find({ postId: { $in: postIds } })
+        .populate('userId', 'nickName')
+        .sort({ commentDate: 1 }),
+      PostTag.find({ postId: { $in: postIds } })
+        .populate('tagId'),
+    ]);
+
+    const result = posts.map((post) => ({
+      ...post.toObject(),
+      comments: comments.filter((c) => c.postId.equals(post._id)),
+      tags: postTags
+        .filter((pt) => pt.postId.equals(post._id))
+        .map((pt) => pt.tagId),
+    }));
+
+    await setCache(cacheKeys.postsList, result);
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -65,9 +83,23 @@ const getPostById = async (req, res) => {
     const post = await Post.findById(req.params.id).populate('userId', 'nickName');
     if (!post) return res.status(404).json({ error: 'Post no encontrado' });
 
-    await setCache(cacheKey, post);
+    const [comments, postTags] = await Promise.all([
+      Comment.find({ postId: post._id })
+        .populate('userId', 'nickName')
+        .sort({ commentDate: 1 }),
+      PostTag.find({ postId: post._id })
+        .populate('tagId'),
+    ]);
 
-    res.json(post);
+    const result = {
+      ...post.toObject(),
+      comments,
+      tags: postTags.map((pt) => pt.tagId),
+    };
+
+    await setCache(cacheKey, result);
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

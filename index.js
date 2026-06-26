@@ -22,7 +22,7 @@ const swaggerSpec = swaggerJsdoc({
       description: 'API para red social - Trabajo Practico',
     },
     servers: [
-      { url: 'http://localhost:3000' }
+      { url: `http://localhost:${process.env.PORT || 3000}` }
     ],
   },
   apis: ['./src/docs/*.yaml'],

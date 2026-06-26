@@ -369,3 +369,14 @@ components:
             nickName:
               type: string
           description: Usuario autor (populado)
+          
+    PostWithComments:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          properties:
+            comments:
+              type: array
+              description: Comentarios del post
+              items:
+                $ref: '#/components/schemas/Comment'

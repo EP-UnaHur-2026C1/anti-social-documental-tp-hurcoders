@@ -1,0 +1,655 @@
+{
+  "info": {
+    "name": "Anti-Social Net API - HurCoders",
+    "description": "Colección de pruebas para la API REST Anti-Social Net. Usar en orden: primero crear un User, luego un Post, y así sucesivamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "userId",   "value": "", "type": "string" },
+    { "key": "postId",   "value": "", "type": "string" },
+    { "key": "commentId","value": "", "type": "string" },
+    { "key": "tagId",    "value": "", "type": "string" },
+    { "key": "imageId",  "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Crear usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('userId', json._id);",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Tiene _id', () => pm.expect(json._id).to.be.a('string'));",
+                  "pm.test('Tiene nickName', () => pm.expect(json.nickName).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickName\": \"hurcoders_user\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener todos los usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tiene nickName', () => pm.expect(pm.response.json().nickName).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('nickName actualizado', () => pm.expect(pm.response.json().nickName).to.eql('hurcoders_updated'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickName\": \"hurcoders_updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "[ERROR] Crear usuario - nickName duplicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickName\": \"hurcoders_user\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ERROR] Obtener usuario - ID inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/id-invalido", "host": ["{{baseUrl}}"], "path": ["users", "id-invalido"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Crear post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('postId', json._id);",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Tiene _id', () => pm.expect(json._id).to.be.a('string'));",
+                  "pm.test('Tiene title', () => pm.expect(json.title).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mi primer post\",\n  \"content\": \"Contenido de prueba desde Postman\",\n  \"userId\": \"{{userId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener todos los posts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] }
+          }
+        },
+        {
+          "name": "Obtener post por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tiene title', () => pm.expect(pm.response.json().title).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "Actualizar post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('content actualizado', () => pm.expect(pm.response.json().content).to.eql('Contenido actualizado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Contenido actualizado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "[ERROR] Crear post - userId inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Post sin usuario\",\n  \"content\": \"Contenido\",\n  \"userId\": \"000000000000000000000000\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ERROR] Crear post - body inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Post sin content ni userId\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts - Imágenes",
+      "item": [
+        {
+          "name": "Agregar imagen a post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                    "const json = pm.response.json();",
+                    "if (json._id) pm.collectionVariables.set('imageId', json._id);",
+                        "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                        "pm.test('Tiene _id', () => pm.expect(json._id).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/images", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "images"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageUrl\": \"https://picsum.photos/400/300\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar imagen de post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/images/{{imageId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "images", "{{imageId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts - Comentarios",
+      "item": [
+        {
+          "name": "Crear comentario en post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('commentId', json._id);",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Tiene content', () => pm.expect(json.content).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/comments", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "comments"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Muy buen post!\",\n  \"userId\": \"{{userId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener comentarios de un post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/comments", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "comments"] }
+          }
+        },
+        {
+          "name": "Actualizar comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('content actualizado', () => pm.expect(pm.response.json().content).to.eql('Comentario editado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/comments/{{commentId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "comments", "{{commentId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Comentario editado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/comments/{{commentId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "comments", "{{commentId}}"] }
+          }
+        },
+        {
+          "name": "[ERROR] Crear comentario - userId inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/comments", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "comments"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Comentario de usuario fantasma\",\n  \"userId\": \"000000000000000000000000\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "item": [
+        {
+          "name": "Crear tag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('tagId', json._id);",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Tiene name', () => pm.expect(json.name).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/tags", "host": ["{{baseUrl}}"], "path": ["tags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"javascript\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener todos los tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tags", "host": ["{{baseUrl}}"], "path": ["tags"] }
+          }
+        },
+        {
+          "name": "Obtener tag por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tiene name', () => pm.expect(pm.response.json().name).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tags/{{tagId}}", "host": ["{{baseUrl}}"], "path": ["tags", "{{tagId}}"] }
+          }
+        },
+        {
+          "name": "Actualizar tag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('name actualizado', () => pm.expect(pm.response.json().name).to.eql('nodejs'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/tags/{{tagId}}", "host": ["{{baseUrl}}"], "path": ["tags", "{{tagId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"nodejs\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar tag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/tags/{{tagId}}", "host": ["{{baseUrl}}"], "path": ["tags", "{{tagId}}"] }
+          }
+        },
+        {
+          "name": "[ERROR] Crear tag - nombre duplicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/tags", "host": ["{{baseUrl}}"], "path": ["tags"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"javascript\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts - Tags",
+      "item": [
+        {
+          "name": "Asociar tag a post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/tags/{{tagId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "tags", "{{tagId}}"] }
+          }
+        },
+        {
+          "name": "Desasociar tag de post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/tags/{{tagId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "tags", "{{tagId}}"] }
+          }
+        },
+        {
+          "name": "[ERROR] Asociar tag - ID inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}/tags/id-invalido", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}", "tags", "id-invalido"] }
+          }
+        }
+      ]
+    }
+  ]
+}

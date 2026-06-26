@@ -3,6 +3,8 @@ services:
     build: .
     ports:
       - "3000:3000"
+    volumes:
+      - ./src/docs:/app/src/docs
     environment:
       - PORT=3000
       - MONGO_URL=mongodb://admin:admin1234@mongo:27017/antisocial?authSource=admin
